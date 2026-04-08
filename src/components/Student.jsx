@@ -2,19 +2,18 @@ import React, { useState, useEffect } from "react";
 import Box from "./Box";
 import Card from "./Cards";
 import { ArrowRight, Sparkles } from "lucide-react";
-import Navbar from "./Navbar";
+import DashboardNavbar from "./DashboardNavbar";
 
 const Student = () => {
-  const [userName, setUserName] = useState("Alex");
+  const [userName] = useState(() => {
+    const storedName = localStorage.getItem("userName");
+    return storedName ? storedName.split(" ")[0] : "Alex";
+  });
 
   const [invitations, setInvitations] = useState([]);
 
   useEffect(() => {
-    const storedName = localStorage.getItem("userName");
-    if (storedName) {
-      setUserName(storedName.split(" ")[0]);
-    }
-    fetch("http://localhost:5000/api/jobs")
+    fetch("/api/jobs")
       .then((res) => res.json())
       .then((data) => setInvitations(data))
       .catch((err) => console.error("Error fetching jobs:", err));
@@ -40,7 +39,8 @@ const Student = () => {
 
   return (
     <div className="w-full border-y-2 border-black bg-[#f2efe9] text-black">
-      <main className="mx-auto max-w-7xl px-6 py-16 md:py-24">
+      <DashboardNavbar />
+      <main className="mx-auto max-w-7xl px-6 pt-28 pb-16 md:pt-32 md:pb-24">
         <div className="mb-16">
           <h1 className="mb-4 text-5xl font-black uppercase md:text-7xl">
             Welcome back, <br className="hidden md:block" />

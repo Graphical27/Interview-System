@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -11,10 +12,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Connect to MongoDB locally
+// Connect to MongoDB
+const MONGO_URI =
+  process.env.MONGO_URI || "mongodb://localhost:27017/interview-system-db";
 mongoose
-  .connect("mongodb://localhost:27017/interview-system-db")
-  .then(() => console.log("Connected to local MongoDB"))
+  .connect(MONGO_URI)
+  .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // --- API Endpoints ---
@@ -107,7 +110,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

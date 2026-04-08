@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus, ArrowRight, Briefcase } from "lucide-react";
+import DashboardNavbar from "./DashboardNavbar";
 
 const mockCandidates = [
   {
@@ -46,7 +47,10 @@ const mockCandidates = [
 
 const Recruiter = () => {
   const [activeJob, setActiveJob] = useState("Senior Frontend Engineer");
-  const [userName, setUserName] = useState("Recruiter");
+  const [userName] = useState(() => {
+    const storedName = localStorage.getItem("userName");
+    return storedName ? storedName.split(" ")[0] : "Recruiter";
+  });
   const [isPostingModalOpen, setIsPostingModalOpen] = useState(false);
   const [newJobData, setNewJobData] = useState({
     role: "",
@@ -59,14 +63,7 @@ const Recruiter = () => {
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
-    let name = "Recruiter";
-    const storedName = localStorage.getItem("userName");
-    if (storedName) {
-      name = storedName.split(" ")[0];
-      setUserName(name);
-    }
-
-    fetch(`http://localhost:5000/api/jobs?postedBy=${name}`)
+    fetch(`/api/jobs?postedBy=${userName}`)
       .then((res) => res.json())
       .then((data) => {
         setJobs(data);
@@ -75,12 +72,12 @@ const Recruiter = () => {
         }
       })
       .catch((err) => console.error("Error fetching jobs:", err));
-  }, []);
+  }, [userName]);
 
   const handleJobSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/api/jobs", {
+      const response = await fetch("/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...newJobData, postedBy: userName }),
@@ -111,6 +108,7 @@ const Recruiter = () => {
 
   return (
     <div className="relative min-h-screen w-full border-y-2 border-black bg-[#f2efe9] font-sans text-black">
+      <DashboardNavbar />
       {isPostingModalOpen && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
           <div className="w-full max-w-lg border-2 border-black bg-white p-8 ">
@@ -224,7 +222,7 @@ const Recruiter = () => {
         </div>
       )}
 
-      <main className="mx-auto max-w-7xl px-6 py-16 md:py-24">
+      <main className="mx-auto max-w-7xl px-6 pt-28 pb-16 md:pt-32 md:pb-24">
         <div className="mb-16 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <h1 className="mb-4 text-5xl leading-none font-black tracking-tighter uppercase md:text-7xl">
